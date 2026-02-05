@@ -1,0 +1,99 @@
+header{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-bottom: solid;
+}
+button{
+    background-color: white;
+    border: none;
+    border-bottom: double 3px black;
+    height: 5vh;
+    width: 15vh;
+    min-width: fit-content;
+    min-height: fit-content;
+    overflow: hidden;
+    border-radius: 999px;
+    box-shadow: 2px 2px 4px black;
+}
+#home_button{animation: rotation_intro 2s linear ;}
+button:hover{
+    border: solid 2px black
+}
+.buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+body{
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+}
+main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(rgb(183, 222, 219),white);
+}
+section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+.section{border: solid 1px black;}
+section *{
+    margin-bottom: 5vh;
+}
+input[type="file"]::file-selector-button{
+    background-color: white;
+    border: 5px inset #0000003a;
+    border-radius: 999px;
+    min-width: fit-content;
+    height: 5vh;
+    box-shadow: inset 0 0 10px black;
+}
+caption{
+    display: flex;
+}
+
+table{
+    background-color: white;
+    min-width: 90%;
+    min-height: fit-content;
+    border-collapse: collapse;
+}
+th{
+    background-color: rgba(128, 128, 128, 0.374);
+}
+td{
+    border: solid 1px rgba(0, 0, 0, 0.311);
+}
+
+.Sig_text{
+    font-weight: bold;
+    font-size: x-large;
+}
+
+label{
+    display: flex;
+    flex-direction: column;
+    font-size: large;
+}
+
+@keyframes rotation_intro{
+    0%{
+        transform: rotate(0deg);
+    }
+    25%{
+        transform: rotate(90deg);
+    }
+    50%{
+        transform: rotate(180deg);
+    }
+    75%{
+        transform: rotate(270deg);
+    }
+}

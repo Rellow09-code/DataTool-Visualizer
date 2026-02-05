@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <link rel="stylesheet" href="machine_learning/machine_learning.css  ">
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="machine_learning/machine_learning.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>DataTorn</h1>
+        <h2>For data pre-processing</h2>
+        <nav>
+            <a href="home.html"><button id="home_button">Home</button></a>
+        </nav>
+    </header>
+    <main>
+        <section class="section">
+            <h1>Start by uploading your csv file</h1>
+            <input type="file" name="csv">
+        </section>
+        <section>
+            <h1>Controls</h1>
+            <section class="buttons">
+                <label><b>Verify the csv structure</b> <button onclick="verify_structure()">Run</button></label>
+                <label><b>Check For duplicates</b> <button onclick="check_duplicates()">Run</button></label>
+                <label><b>Check For blank entries</b> <button onclick="check_missing_values()">Run</button></label>
+                <label><b>Show Inconsistent column</b> <button onclick="show_incosistency()">Run</button></label>
+                <label><b>load a demo file</b> <button onclick="upload_demo()">Run</button></label>
+            </section>
+            <section class="buttons">
+                <label><b>Show all statistics</b> <button onclick="show_stats()">Run</button></label>
+                <label><b>Summation</b> <button onclick="show_sum()">Run</button></label>
+                <label><b>Mean</b> <button onclick="show_mean()">Run</button></label>
+                <label><b>Standard deviation</b> <button onclick="show_std_deviation()">Run</button></label>
+                <label><b>reset</b> <button onclick="reset()">Run</button></label>
+            </section>
+            <p class="Sig_text"></p>
+        </section>
+        <section>
+            <table>
+                <thead></thead>
+                <tbody></tbody>
+                <tfoot></tfoot>
+            </table>
+            <caption>Your csv will show here</caption>
+        </section>
+    </main>
+</body>

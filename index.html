@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <link rel="stylesheet" href="home/home.css">
+    <script src="home/scene_graph_tools.js" defer></script>
+    <script src="home/forex.js" defer></script>
+    <script src="home/home.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>DataTorn</h1>
+        <h2>For data processing visualization</h2>
+        <nav>
+            <a href="machine_learning_preparations.html"><button>Machine Learning Preparations</button></a>
+        </nav>
+    </header>
+    <main>
+        <section id="data_generation">
+            <h4>You can generate data here</h4>
+            <section id="input_sec">
+                <input type="number" placeholder="How many numbers" id="number_count" min="1">
+                <input type="number" placeholder="max" id="max">
+                <input type="number" placeholder="minimum" id="minimum">
+                <input type="number" placeholder="round to n decimal place" id="rounding" min="0">
+                <section>
+                    <legend>Select the chart type</legend>
+                    <label><input type="radio" name="chart" value="scatter plot">Scatter Plot</label>
+                    <label><input type="radio" name="chart" value="candle chart">Candle Chart</label>
+                    <label><input type="radio" name="chart" value="live candle chart">Live Candle Chart</label>
+                </section>
+                <h4><input type="checkbox" id="cummulative"> cummulative or chart type</h4>
+            </section>
+            <button id="generate_data" onclick="generate()">Generate</button>
+            <h4 id="data">0, 0, 0, 0, 0, 0, 0, 0, 0, 0</h4>
+        </section>
+        <section id="visualization">
+            <canvas id="display" width="1200px" height="675px"></canvas>
+        </section>
+    </main>
+</body>
+</html>
