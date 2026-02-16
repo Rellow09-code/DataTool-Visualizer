@@ -2,11 +2,20 @@ const my_file_input = document.querySelector('input[type="file"]')
 const table_head = document.querySelector('thead')
 const table_body = document.querySelector('tbody')
 const output = document.querySelector('p')
+let my_csv;
 let table_matrix = []
 let table_rows = []
 let table_cols = []
 
+//table controls
+let filtering_col = 6;
+let filter_data = '15-01-2023'
+//dates
+const date_YYYYMMDD = /^(19|20)\d\d[-\/.](0[1-9]|1[0-2])[-\/.](0[1-9]|[12][0-9]|3[01])$/
+const date_DDMMYYYY = /^(0[1-9]|[12][0-9]|3[01])[-\/.](0[1-9]|1[0-2])[-\/.](19|20)\d\d$/
+
 // Define regexes ONCE
+const NUMBERS = /[+-]?\d+(\.\d+)?([eE][+-]?\d+)?/
 const INTEGER_POSITIVE = /^\+?\d+$/;
 const BLANK = /^\s*$/;
 const INTEGER_SIGNED = /^-?\d+$/;
@@ -73,9 +82,6 @@ function alert_numeric_cols(){
         if (numeric){
             table_cols[0][col].setAttribute('title',`Numeric column`)
         }
-        else{
-            table_cols[0][col].setAttribute('title',`Non Numeric column`)
-        }
     }
 }
 
@@ -90,8 +96,7 @@ function make_table_matrix(text){
     });
 
     table_matrix = result.data;
-    table_matrix_to_html();
-    alert_numeric_cols()
+    return table_matrix;
 }
 
 function verify_structure(){
@@ -174,16 +179,20 @@ function check_missing_values(){
     }
 }
 
-function table_matrix_to_html(){
+function table_matrix_to_html(t_matrix=null){
+    if (!t_matrix){
+        t_matrix = table_matrix
+    }
+    
     table_rows = [];
     table_cols = [];
     table_head.innerHTML = '';
     table_body.innerHTML = '';
     const tr = document.createElement('tr')
     table_cols.push([])
-    for (let i=0; i<table_matrix[0].length; i++){
+    for (let i=0; i<t_matrix[0].length; i++){
         const th = document.createElement('th');
-        th.innerHTML = table_matrix[0][i];
+        th.innerHTML = t_matrix[0][i];
         tr.appendChild(th)
         table_cols[0].push(th)
     }
@@ -191,12 +200,12 @@ function table_matrix_to_html(){
     table_rows.push(tr)
     
 
-    for (let row=1; row<table_matrix.length; row++){
+    for (let row=1; row<t_matrix.length; row++){
         const tr = document.createElement('tr')
         table_cols.push([])
-        for (let col=0; col<table_matrix[row].length; col++){
+        for (let col=0; col<t_matrix[row].length; col++){
             const td = document.createElement('td');
-            td.innerHTML = table_matrix[row][col];
+            td.innerHTML = t_matrix[row][col];
             if (row%2==0){
                 td.style.backgroundColor = 'rgba(0, 0, 0, 0.075)'
             }
@@ -305,6 +314,8 @@ my_file_input.addEventListener('change',(e)=>{
     const reader = new FileReader()
     reader.onload = ()=>{
         make_table_matrix(reader.result)
+        table_matrix_to_html();
+        alert_numeric_cols()
     }
     reader.readAsText(file)
     report(output, `Upload successful ✅`, 'black')
@@ -359,14 +370,272 @@ function show_stats(){
 function reset(){
     table_matrix_to_html()
 }
-
-const my_csv = 
+my_csv = 
 `id,name,age,gender,income,city,signup_date
+1,Alice,29,Female,55000,New York,15-01-2023
+2,Bob,34,Male,62000,Los Angeles,17-01-2023
+2,Bob,34,Male,62000,Los Angeles,20-01-2023
+2,Bob,34,Male,62000,Los Angeles,17-02-2023
+3,Charlie,-89.90,male,580,New York,20-03-2023
+4,Diana,+45,FEMALE,13,Chicago,21-05-2023,
+5,Diana,+45,FEMALE,3,Chicago,22-05-2023`
+//------------------------------------------------------------------------------------------
+
+class Text{
+    constructor(text='N/A'){
+        this.text = text
+        this.tag = [document.createElement('p')]
+    }
+    test(text){
+        return true
+    }
+    get_value(){
+        return this.text
+    }
+    get_html(){
+        let curr = this.tag[0]
+        curr.innerHTML = this.text;
+
+        for (let i=1; i<this.tag.length; i++){
+            this.tag[i].appendChild(curr)
+            curr = this.tag[i]
+        }
+        return curr;
+    }
+    set_text(text){
+       this.text = text 
+    }
+    add_html(tag){
+        this.tag.push(document.createElement(tag))
+        console.log(this.tag)
+    }
+
+    greater_than(other_text){
+        return this.get_value() > other_text.get_value()
+    }
+    equals_to(other_text){
+        return this.get_value() == other_text.get_value()
+    }
+    less_than(other_text){
+        return this.get_value() < other_text.get_value()
+    }
+    
+}
+
+class MyDate extends Text{
+    constructor(date='2023-02-21'){
+        super();
+        this.day = 1
+        this.month = 1
+        this.year = 2023
+        this.set_date(date)
+    }
+    test(date){
+        return date_DDMMYYYY.test(date) || date_YYYYMMDD.test(date)
+    }
+    set_date(date){
+        let my_arr = date.split(/[-/.]/);
+        if (!this.test(date)){
+            report(output,'Invalid date found','Red')
+            alert("Invalid date")
+            return
+        }
+
+        if(my_arr[0].length==4){
+            //begins with year
+            this.year = Number(my_arr[0]);
+            this.month = Number(my_arr[1]);
+            this.day = Number(my_arr[2])
+        }
+        else{
+            //begins with day
+            this.day = Number(my_arr[0]);
+            this.month = Number(my_arr[1]);
+            this.year = Number(my_arr[2])
+        }
+
+    }
+    get_value(){
+        let my_year = `${this.year}`
+        let my_month = `${this.month}`
+        let my_day = `${this.day}`
+        if (`${this.month}`.length == 1){
+            my_month = `0`+my_month
+        }
+        if (`${this.day}`.length == 1){
+            my_day = `0`+my_day
+        }
+        return `${my_year}/${my_month}/${my_day}`
+    }
+    greater_than(date){
+        if (this.year > date.year){
+            return true
+        }
+        else if (this.month > date.month){
+            return true
+        }
+        else if (this.day > date.day){
+            return true
+        }
+        return false
+    }
+    equals_to(date){
+        if (this.year == date.year &&this.month == date.month &&this.day == date.day){
+            return true
+        }
+        return false
+    }
+    less_than(date){
+        if (this.year < date.year){
+            return true
+        }
+        else if (this.month < date.month){
+            return true
+        }
+        else if (this.day < date.day){
+            return true
+        }
+        return false
+    }
+}
+class MyNumber extends Text{
+    constructor(number=0){
+        super()
+        this.number = 0
+        this.set_number(number)
+    }
+    test(number){//tests for its kind
+        return NUMBERS.test(number)
+    }
+    set_number(number){
+        if (!this.test(number)){
+            alert("Invalid number")
+            return
+        }
+        this.number = Number(number)
+    }
+    get_value(){
+        return `${this.number}`;
+    }
+    greater_than(other_number){
+        return this.number > other_number.number
+    }
+    equals_to(other_number){
+        return this.number == other_number.number
+    }
+    less_than(other_number){
+        return this.number < other_number.number
+    }
+
+}
+class Table{
+    constructor(my_string){
+        //all types must have default values
+        //order from specific types to trivial types
+        this.possible_types = [MyDate,MyNumber,Text] 
+        this.string = my_string
+        this.table = []
+        this.column_types = this.possible_types //dummy types (for testing)
+        this.table_matrix = make_table_matrix(my_string)
+        this.build_table()
+    }
+    build_table(){
+        this.set_column_types()
+        this.add_table_headers()
+        this.add_table_data()
+    }
+    set_column_types(){
+        this.column_types = [];
+        for (let col=0; col<this.table_matrix[0].length; col++){
+            for (let Type of this.possible_types){
+                const my_type = new Type()
+                if (this.test_column((value)=>my_type.test(value),col)){
+                    this.column_types.push(Type)
+                    break;
+                }
+            }
+        }
+    }
+    show_table(){
+        make_table_matrix(this.string)
+        table_matrix_to_html();
+        alert_numeric_cols()
+    }
+    
+    test_column(call_back,column_number){
+        for (let row=1; row<this.table_matrix.length; row++){
+            if (call_back(table_matrix[row][column_number])){
+                continue
+            }
+            return false
+        }
+        return true
+    }
+    add_table_headers(){
+        this.table.push([])
+        for (let j=0; j<this.table_matrix[0].length; j++){
+            this.table[0].push(new Text(this.table_matrix[0][j]))
+        }
+    }
+    add_table_data(){
+        for (let row=1; row<this.table_matrix.length; row++){
+            this.table.push([])
+            for (let col=0; col<this.table_matrix[0].length; col++){
+                let DataType = this.column_types[col]
+                let data = new DataType(this.table_matrix[row][col])
+                this.table[row].push(data)
+            }
+        }
+    }
+    filter_table_to_matrix(column_to_filter,expected_data){
+        if (column_to_filter>=this.column_types.length){
+            alert('Column does not exist')
+            return
+        }
+        let Type = this.column_types[column_to_filter]
+        let data = new Type(expected_data)
+        const matrix = [[]]
+        //add headers
+        for (let k=0; k<this.table[0].length; k++){
+            matrix[0].push(this.table[0][k].get_value())
+        }
+
+        //add data
+        for (let row=1; row<this.table.length; row++){
+            matrix.push([])
+            let pushed = false;
+            for (let col=0; col<this.table[0].length; col++){
+                if (this.table[row][col].equals_to(data)){
+                    pushed = true;
+                    for (let k=0; k<this.table[0].length; k++){
+                        matrix[row].push(this.table[row][k].get_value())
+                    }
+                }
+            }
+        }
+        //clean the matrix
+        const final = []
+        for (let row = 0; row<matrix.length; row++){
+            if (matrix[row].length > 0){
+                final.push(matrix[row])
+            }
+        }
+        return final;
+    }
+}
+
+
+
+upload_demo()
+//-------------------------------------------------------------------------------------------
+
+
+
+const temp=`id,name,age,gender,income,city,signup_date
 1,Alice,29,Female,55000,New York,2023-01-15
 2,Bob,34,Male,62000,Los Angeles,2023-01-17
-3,Charlie,-89.90,male,58000,New York,2023-01-20`
-const other =
-`4,Diana,+45,FEMALE,3,Chicago,01-2023-54
+3,Charlie,-89.90,male,58000,New York,2023-01-20
+4,Diana,+45,FEMALE,3,Chicago,01-2023-54
 5,Evan,-150,Male,72000,Chicago,2023-02-03
 6,Frank,38,,68000,Los Angeles,
 7,Alice,29,Female,55000,New York,2023-01-15
@@ -377,5 +646,10 @@ const other =
 12,Kate,31e9,Female,63000, Miami ,2023-02-20
 `
 function upload_demo(){
-    make_table_matrix(my_csv)
+    let my_table = new Table(my_csv);
+    my_table.show_table()
+
+    filtered_matrix = my_table.filter_table_to_matrix(filtering_col,filter_data)
+    console.log(filtered_matrix)
+    table_matrix_to_html(filtered_matrix)
 }
