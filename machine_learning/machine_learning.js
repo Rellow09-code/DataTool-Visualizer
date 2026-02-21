@@ -2,17 +2,20 @@ const my_file_input = document.querySelector('input[type="file"]')
 const table_head = document.querySelector('thead')
 const table_body = document.querySelector('tbody')
 const output = document.querySelector('p')
+let year_element = document.getElementById('year')
+let month_element = document.getElementById('month')
+let target_col = document.getElementById('target_column')
 let my_csv;
 let table_matrix = []
 let table_rows = []
 let table_cols = []
+let my_table;
 
 //table controls
 let filtering_col = 6;
-let filter_data = '15-01-2023'
 //dates
-const date_YYYYMMDD = /^(19|20)\d\d[-\/.](0[1-9]|1[0-2])[-\/.](0[1-9]|[12][0-9]|3[01])$/
-const date_DDMMYYYY = /^(0[1-9]|[12][0-9]|3[01])[-\/.](0[1-9]|1[0-2])[-\/.](19|20)\d\d$/
+const date_YYYYMMDD = /^(19|20)\d\d[-\/.](0[1-9]|[1-9]|1[0-2])[-\/.](0[1-9]|[1-9]|[12][0-9]|3[01])$/
+const date_DDMMYYYY = /^(0[1-9]|[1-9]|[12][0-9]|3[01])[-\/.](0[1-9]|[1-9]|1[0-2])[-\/.](19|20)\d\d$/
 
 // Define regexes ONCE
 const NUMBERS = /[+-]?\d+(\.\d+)?([eE][+-]?\d+)?/
@@ -68,6 +71,12 @@ const regexDescriptions = new Map([
   [TRIM_WS, "Leading or trailing whitespace"],
   [MULTI_COMMA, "Multiple consecutive commas / possible CSV error"]
 ]);
+
+function add_column_control(){
+    for (let col=0; col<table_cols[0].length; col++){
+        table_cols[0][col].addEventListener('click',()=>trigger_column_menu())
+    }
+}
 
 function alert_numeric_cols(){
     for (let col=0; col<table_matrix[0].length; col++){
@@ -250,10 +259,13 @@ function add_row(data_list=[NaN],backgroundColor = 'white'){
     table_body.appendChild(tr)
 }
 //statistics section
-function get_col_sum(col = 0){
+function get_col_sum(col = 0,matrix=null){
+    if (!matrix){
+        matrix = table_matrix
+    }
     let sum = 0;
-    for (let row=1; row<table_matrix.length; row++){
-        sum += Number(table_matrix[row][col])
+    for (let row=1; row<matrix.length; row++){
+        sum += Number(matrix[row][col])
     }
     return sum
 }
@@ -321,13 +333,14 @@ my_file_input.addEventListener('change',(e)=>{
     report(output, `Upload successful ✅`, 'black')
 })
 
-function show_sum(clear=true){
+function show_sum(clear=true, matrix=null){
+    if (!matrix){matrix = table_matrix}
     if (clear){
         reset()
     }
     const sum = []
-    for (let col=0; col<table_matrix[0].length; col++){
-        sum.push(get_col_sum(col)||' ')
+    for (let col=0; col<matrix[0].length; col++){
+        sum.push(get_col_sum(col,matrix)||' ')
     }
     sum.push('Sum')
     const color = 'rgba(104, 253, 151, 0.25)'
@@ -497,6 +510,17 @@ class MyDate extends Text{
         }
         return false
     }
+
+    //extras
+    same_year(date){
+        return date.year == this.year
+    }
+    same_month(date){
+        return date.year == this.year && date.month == this.month
+    }
+    same_day(date){
+        return date.year == this.year && date.month == this.month && date.day == this.day 
+    }
 }
 class MyNumber extends Text{
     constructor(number=0){
@@ -560,6 +584,7 @@ class Table{
         make_table_matrix(this.string)
         table_matrix_to_html();
         alert_numeric_cols()
+        add_column_control()
     }
     
     test_column(call_back,column_number){
@@ -587,13 +612,16 @@ class Table{
             }
         }
     }
-    filter_table_to_matrix(column_to_filter,expected_data){
+    filter_table_to_matrix(column_to_filter,data,method=null){
+        if (!method){
+            method = (data1,data2)=>{
+                return data1.equals_to(data2)
+            }
+        }
         if (column_to_filter>=this.column_types.length){
             alert('Column does not exist')
             return
         }
-        let Type = this.column_types[column_to_filter]
-        let data = new Type(expected_data)
         const matrix = [[]]
         //add headers
         for (let k=0; k<this.table[0].length; k++){
@@ -601,15 +629,13 @@ class Table{
         }
 
         //add data
+        let curr_row = 0;
         for (let row=1; row<this.table.length; row++){
-            matrix.push([])
-            let pushed = false;
-            for (let col=0; col<this.table[0].length; col++){
-                if (this.table[row][col].equals_to(data)){
-                    pushed = true;
-                    for (let k=0; k<this.table[0].length; k++){
-                        matrix[row].push(this.table[row][k].get_value())
-                    }
+            if (method(this.table[row][column_to_filter],data)){
+                matrix.push([])
+                curr_row +=1
+                for (let col=0; col<this.table[0].length; col++){
+                    matrix[curr_row].push(this.table[row][col].get_value())
                 }
             }
         }
@@ -624,6 +650,15 @@ class Table{
     }
 }
 
+function trigger_column_menu(){
+    const menu = document.getElementById('column_menu')
+    if (menu.style.display=='flex'){
+        menu.style.display = 'none'
+    }
+    else{
+        menu.style.display = 'flex'
+    }
+}
 
 
 upload_demo()
@@ -646,10 +681,30 @@ const temp=`id,name,age,gender,income,city,signup_date
 12,Kate,31e9,Female,63000, Miami ,2023-02-20
 `
 function upload_demo(){
-    let my_table = new Table(my_csv);
+    my_table = new Table(my_csv);
     my_table.show_table()
+}
 
-    filtered_matrix = my_table.filter_table_to_matrix(filtering_col,filter_data)
+month_element.addEventListener('change',()=>filter_date())
+year_element.addEventListener('change',()=>filter_date())
+target_col.addEventListener('change',()=>{
+    filtering_col = Number(target_col.value)-1
+    console.log(table_matrix[0][filtering_col])
+    filter_date()
+})
+
+function filter_date(){
+    const year = year_element.value || '2023'
+    const month = month_element.value || '01'
+    const day = '01'
+
+    const my_date = `${year}-${month}-${day}`
+    console.log(my_date)
+    let date = new MyDate(my_date)
+    let my_method = (date1,date2)=>date1.same_month(date2)
+
+    let filtered_matrix = my_table.filter_table_to_matrix(filtering_col,date,my_method)
     console.log(filtered_matrix)
     table_matrix_to_html(filtered_matrix)
+    show_sum(false,filtered_matrix)
 }
