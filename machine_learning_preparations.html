@@ -37,6 +37,11 @@
                 <label><b>Standard deviation</b> <button onclick="show_std_deviation()">Run</button></label>
                 <label><b>reset</b> <button onclick="reset()">Run</button></label>
             </section>
+            <section id="column_menu">
+                <h3>Column Menu</h3>
+                <label>filtered by months <button>Show summation</button></label>
+                <button onclick="trigger_column_menu()">Done 😎</button>
+            </section>
             <p class="Sig_text"></p>
         </section>
         <section>
@@ -45,7 +50,12 @@
                 <tbody></tbody>
                 <tfoot></tfoot>
             </table>
-            <caption>Your csv will show here</caption>
+            <label>filtering_col<input id="target_column" type="number" min="1"></label>
+            <section>
+                <label>Year: <input id="year" type="number" min="2000"></label>
+                <label>Month: <input id="month" type="number" min="1"></label>
+                <caption>Your csv will show here</caption>
+            </section>
         </section>
     </main>
 </body>
