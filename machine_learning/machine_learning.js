@@ -325,9 +325,8 @@ my_file_input.addEventListener('change',(e)=>{
     const file = e.target.files[0];
     const reader = new FileReader()
     reader.onload = ()=>{
-        make_table_matrix(reader.result)
-        table_matrix_to_html();
-        alert_numeric_cols()
+        my_table = new Table(reader.result)
+        my_table.show_table()
     }
     reader.readAsText(file)
     report(output, `Upload successful ✅`, 'black')
@@ -552,6 +551,7 @@ class MyNumber extends Text{
     }
 
 }
+
 class Table{
     constructor(my_string){
         //all types must have default values
@@ -567,6 +567,7 @@ class Table{
         this.set_column_types()
         this.add_table_headers()
         this.add_table_data()
+        this.add_filter_options()
     }
     set_column_types(){
         this.column_types = [];
@@ -648,6 +649,15 @@ class Table{
         }
         return final;
     }
+    add_filter_options(){
+        target_col.innerHTML = ''
+        for (let i=0; i<this.table_matrix[0].length; i++){
+            let option = document.createElement('option')
+            option.innerHTML = this.table_matrix[0][i];
+            option.value = i;
+            target_col.appendChild(option)
+        }
+    }
 }
 
 function trigger_column_menu(){
@@ -661,7 +671,7 @@ function trigger_column_menu(){
 }
 
 
-upload_demo()
+
 //-------------------------------------------------------------------------------------------
 
 
@@ -688,10 +698,25 @@ function upload_demo(){
 month_element.addEventListener('change',()=>filter_date())
 year_element.addEventListener('change',()=>filter_date())
 target_col.addEventListener('change',()=>{
-    filtering_col = Number(target_col.value)-1
+    filtering_col = Number(target_col.value)
     console.log(table_matrix[0][filtering_col])
     filter_date()
 })
+
+function scroll_up(){
+    //auto scrolling
+    window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+    });
+}
+function scroll_down(){
+    //auto scrolling
+    window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: 'smooth'
+    });
+}
 
 function filter_date(){
     const year = year_element.value || '2023'
@@ -707,4 +732,5 @@ function filter_date(){
     console.log(filtered_matrix)
     table_matrix_to_html(filtered_matrix)
     show_sum(false,filtered_matrix)
+    scroll_down()
 }

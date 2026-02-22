@@ -1,81 +1,210 @@
-body{
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    font-family: 'Courier New', Courier, monospace;
+/* ================= ROOT ================= */
+:root {
+  --bg-dark: #070a0f;
+  --bg-panel: #0e1623;
+  --bg-panel-2: #111b2e;
+
+  --green: #16c784;
+  --green-glow: rgba(22,199,132,0.45);
+
+  --red: #ea3943;
+  --red-glow: rgba(234,57,67,0.45);
+
+  --border: rgba(255,255,255,0.08);
+  --text-dim: #9aa4b2;
 }
 
-header{
-    display: flex;
-    justify-content: space-evenly;
-    background-color: rgba(0,0,0,1);
-    color: white;
-}
-nav{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-nav button{
-    min-width: fit-content;
-    height: 5vh;
-    border-radius: 999px;
-    box-shadow: 0px 0px 10px white;
-}
-nav button:hover{
-    background-color: rgba(87, 87, 87, 0.7);
-    box-shadow: 5px 5px 10px black;
+/* ================= RESET ================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
-main{
-    display: flex;
-    flex-direction: column;
+/* ================= BODY ================= */
+body {
+  min-height: 100vh;
+  color: white;
+  background:
+    radial-gradient(circle at 25% 30%, rgba(22,199,132,0.18), transparent 40%),
+    radial-gradient(circle at 75% 70%, rgba(234,57,67,0.18), transparent 40%),
+    linear-gradient(145deg, #05070c, #0b1220 60%, #05070c);
+  background-size: cover; /* No movement */
+  animation: bgPulse 4s ease-in-out infinite alternate;
 }
 
-#data_generation{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
-    background: linear-gradient(rgb(47, 47, 47),white);
-    border: 1px black solid;
-}
-#visualization{
-    display: flex;
-    justify-content: center;
-    border: 3px solid black;
-    margin-top: 2%;
-    margin-bottom: 2%;
-    background: linear-gradient(white,rgb(47, 47, 47));
+@keyframes bgPulse {
+  0% { filter: brightness(0.97); }
+  100% { filter: brightness(1.03); }
 }
 
-button{
-    border-radius: 6px;
-    box-shadow: 0px 0 5px rgba(102,153,204,1);
-}
-button:hover{
-    background-color: rgba(102,153,204,1);
-}
-section button{
-    animation: pop_in_out 2s cubic-bezier(0.075, 0.82, 0.165, 1);
-}
-#data{
-    background-color: white;
-    color: black;
+/* ================= HEADER ================= */
+header {
+  padding: 32px 48px;
+  border-bottom: 1px solid var(--border);
+  animation: slideDown 0.8s ease forwards;
 }
 
-@keyframes pop_in_out{
-    0%{
-        transform: scale(1,1);
-    }
-    50%{
-        transform: scale(3,3);
-    }
+header h1 {
+  font-size: 2.8rem;
+  background: linear-gradient(90deg, var(--green), var(--red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/*main colors
-0,0,0
-102,153,204
-0,0,128
-0,51,51
+header h2 {
+  margin-top: 6px;
+  font-weight: 400;
+  color: var(--text-dim);
+}
+
+/* ================= MAIN LAYOUT ================= */
+main {
+  padding: 36px;
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 32px;
+}
+
+/* ================= PANELS ================= */
+section {
+  background: linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  backdrop-filter: blur(16px);
+  animation: fadeUp 0.8s ease forwards;
+}
+
+/* ================= INPUT AREA ================= */
+#input_sec {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+/* ================= INPUTS ================= */
+input[type="number"] {
+  background: #0a1020;
+  border: 1px solid var(--border);
+  color: white;
+  padding: 12px 14px;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+
+input[type="number"]:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 14px var(--green-glow);
+  transform: translateY(-2px);
+}
+
+/* ================= RADIO / CHECK ================= */
+label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+label:hover {
+  color: var(--green);
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--green);
+  transform: scale(1.15);
+}
+
+/* ================= GENERATE BUTTON ================= */
+#generate_data {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, var(--green), var(--red));
+  color: #000;
+  cursor: pointer;
+  animation: energyPulse 3s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#generate_data:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow:
+    0 0 30px var(--green-glow),
+    0 0 30px var(--red-glow);
+}
+
+@keyframes energyPulse {
+  0%,100% { filter: brightness(1); }
+  50% { filter: brightness(1.25); }
+}
+
+/* ================= DATA OUTPUT ================= */
+#data {
+  margin-top: 16px;
+  padding: 14px;
+  height: 120px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85rem;
+  line-height: 1.4;
+
+  background: #05070c;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  color: var(--text-dim);
+  box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
+}
+
+/* ================= VISUALIZATION ================= */
+#visualization {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================= CANVAS ================= */
+canvas {
+  width: 100%;
+  max-width: 1200px;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,0.04), transparent),
+    #05070c;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.05),
+    0 0 50px var(--green-glow),
+    0 0 50px var(--red-glow);
+  animation: canvasFloat 6s ease-in-out infinite;
+}
+
+@keyframes canvasFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ================= ANIMATIONS ================= */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
